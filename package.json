@@ -2,6 +2,11 @@
   "name": "cc-websocket-reload",
   "displayName": "CC-Websocket-Reload",
   "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WasteofSpaceYT/cc-websocket-reload.git"
+  },
+  "publisher": "WasteofSpaceYT",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.72.0"
@@ -32,12 +37,16 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "vscode:prepublish": "npm run esbuild-base -- --minify",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+    "test-compile": "tsc -p ./"
   },
   "devDependencies": {
     "@types/glob": "^8.0.0",
@@ -48,6 +57,7 @@
     "@typescript-eslint/eslint-plugin": "^5.38.1",
     "@typescript-eslint/parser": "^5.38.1",
     "@vscode/test-electron": "^2.1.5",
+    "esbuild": "^0.15.12",
     "eslint": "^8.24.0",
     "glob": "^8.0.3",
     "mocha": "^10.0.0",
