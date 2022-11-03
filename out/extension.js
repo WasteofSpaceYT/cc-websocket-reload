@@ -7,20 +7,17 @@ function activate(context) {
     let toggled = false;
     let menu = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 0);
     let connectionCount = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 0);
-    connectionCount.text = '0';
+    connectionCount.text = `Connections: 0`;
+    ;
     connectionCount.show();
     let wsServer;
-    try {
-        wsServer = new ws_1.WebSocketServer({ port: vscode.workspace.getConfiguration("cc-websocket-reload").get('port') });
-    }
-    catch (e) {
-        vscode.window.showErrorMessage("Failed to start websocket server" + " " + e);
-    }
-    try {
-        vscode.window.showInformationMessage(wsServer.path);
-    }
-    catch (e) {
-        vscode.window.showErrorMessage("Failed to get path" + " " + e);
+    if (toggled) {
+        try {
+            wsServer = new ws_1.WebSocketServer({ port: vscode.workspace.getConfiguration("cc-websocket-reload").get('port') });
+        }
+        catch (e) {
+            vscode.window.showErrorMessage("Failed to start websocket server" + " " + e);
+        }
     }
     if (wsServer) {
         wsServer.on('connection', (ws) => {

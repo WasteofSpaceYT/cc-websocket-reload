@@ -11,16 +11,13 @@ export function activate(context: vscode.ExtensionContext) {
 	connectionCount.text = `Connections: 0`;;
 	connectionCount.show();
 	let wsServer: WebSocketServer | undefined;
+	if(toggled){
 	try {
 		wsServer = new WebSocketServer({ port: vscode.workspace.getConfiguration("cc-websocket-reload").get('port') });
 	} catch (e) {
 		vscode.window.showErrorMessage("Failed to start websocket server" + " " + e);
 	}
-	try {
-		vscode.window.showInformationMessage(wsServer!.path);
-	} catch (e) {
-		vscode.window.showErrorMessage("Failed to get path" + " " + e);
-	}
+}
 	if (wsServer) {
 		wsServer.on('connection', (ws) => {
 			vscode.window.showInformationMessage("Computer connected to websocket");
