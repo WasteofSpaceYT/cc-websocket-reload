@@ -8,6 +8,10 @@ export function activate(context: vscode.ExtensionContext) {
 	let toggled = false;
 	let menu = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 0);
 	let connectionCount = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 0);
+	const awaitTimeout = (ms: number) => new Promise((resolve) => setTimeout(async () => {
+		return (typeof await vscode.workspace.fs.readDirectory(vscode.Uri.file(vscode.workspace.workspaceFolders![0].uri.fsPath + "/dist"))) === "object";
+		resolve;
+	}, ms));
 	connectionCount.text = `Connections: 0`;;
 	connectionCount.show();
 	let wsServer: WebSocketServer | undefined;
@@ -44,9 +48,12 @@ export function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "cc-websocket-reload" is now active!');
 
 	let disposable = vscode.commands.registerCommand('cc-websocket-reload.toggle', async () => {
-		if (!toggled && wsServer) {
+		let distExist = true;
+		console.log(toggled, wsServer);
+		console.log(awaitTimeout(1000).catch((e) => distExist = false));
+		if (!toggled && !wsServer) {
 			vscode.window.showInformationMessage("WebSocket server started on port " + vscode.workspace.getConfiguration("cc-websocket-reload").get('port'));
-			if ((await vscode.workspace.findFiles("**/dist/**")).length > 0) {
+			if (distExist) {
 				let watcher = vscode.workspace.createFileSystemWatcher("**/dist/**");
 				watcher.onDidChange(async (e) => {
 					let file = await vscode.workspace.fs.readFile(vscode.Uri.file(e.path));
@@ -81,6 +88,7 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showInformationMessage("WebSocket Reload Disabled");
 		}
 		toggled = !toggled;
+		console.log(toggled);
 		menu.hide();
 		if (toggled) {
 			menu.text = "WebSocket Reload Enabled";
