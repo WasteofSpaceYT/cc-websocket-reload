@@ -52,6 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
 		console.log(toggled, wsServer);
 		console.log(awaitTimeout(1000).catch((e) => distExist = false));
 		if (!toggled && !wsServer) {
+			wsServer = new WebSocketServer({ port: vscode.workspace.getConfiguration("cc-websocket-reload").get('port') });
 			vscode.window.showInformationMessage("WebSocket server started on port " + vscode.workspace.getConfiguration("cc-websocket-reload").get('port'));
 			if (distExist) {
 				let watcher = vscode.workspace.createFileSystemWatcher("**/dist/**");
@@ -85,6 +86,9 @@ export function activate(context: vscode.ExtensionContext) {
 				vscode.window.showErrorMessage('WebSocket Reload Error: No dist folder found');
 			}
 		} else {
+			console.log(wsServer);
+			wsServer!.close();
+			wsServer = undefined;
 			vscode.window.showInformationMessage("WebSocket Reload Disabled");
 		}
 		toggled = !toggled;
